@@ -23,7 +23,7 @@ function HomePage() {
           loop
           playsInline
           preload="metadata"
-          poster="/food-ring-center.jpg"
+          
           aria-label="Hero background video"
         >
           <source src="/home-hero.mp4" type="video/mp4" />
