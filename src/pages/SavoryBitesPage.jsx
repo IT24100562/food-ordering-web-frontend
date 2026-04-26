@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 
 const menuItems = [
   {
@@ -188,24 +188,24 @@ const orbitItems = [
   { src: "/food-ring-6.jpg", alt: "Charred chicken platter" }
 ];
 
-function FoodOrbit({ className = "" }) {
+const FoodOrbit = memo(function FoodOrbit({ className = "" }) {
   return (
     <div className={`about-orbit ${className}`.trim()}>
       <div className="about-orbit-ring">
         {orbitItems.map((item, index) => (
           <div key={item.src} className={`about-orbit-item orbit-${index + 1}`}>
-            <img src={item.src} alt={item.alt} />
+            <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
           </div>
         ))}
       </div>
       <div className="about-center-dish">
-        <video autoPlay muted loop playsInline preload="metadata" poster="/food-ring-center.jpg">
+        <video autoPlay muted loop playsInline preload="none" poster="/food-ring-center.jpg">
           <source src="/ring-center.mp4" type="video/mp4" />
         </video>
       </div>
     </div>
   );
-}
+});
 
 function SavoryBitesPage() {
   const [cart, setCart] = useState({});
@@ -216,29 +216,50 @@ function SavoryBitesPage() {
   const [toastVisible, setToastVisible] = useState(false);
   const [isNavHidden, setIsNavHidden] = useState(false);
   const lastScrollY = useRef(0);
+  const navHiddenRef = useRef(false);
+  const rafScrollRef = useRef(0);
+  const toastTimerRef = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY <= 10) {
-        setIsNavHidden(false);
-        lastScrollY.current = currentScrollY;
+      if (rafScrollRef.current) {
         return;
       }
 
-      if (currentScrollY > lastScrollY.current + 8) {
-        setIsNavHidden(true);
-      } else if (currentScrollY < lastScrollY.current - 8) {
-        setIsNavHidden(false);
-      }
+      rafScrollRef.current = window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        let nextHidden = navHiddenRef.current;
 
-      lastScrollY.current = currentScrollY;
+        if (currentScrollY <= 10) {
+          nextHidden = false;
+        } else if (currentScrollY > lastScrollY.current + 10) {
+          nextHidden = true;
+        } else if (currentScrollY < lastScrollY.current - 10) {
+          nextHidden = false;
+        }
+
+        if (nextHidden !== navHiddenRef.current) {
+          navHiddenRef.current = nextHidden;
+          setIsNavHidden(nextHidden);
+        }
+
+        lastScrollY.current = currentScrollY;
+        rafScrollRef.current = 0;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafScrollRef.current) {
+        window.cancelAnimationFrame(rafScrollRef.current);
+      }
+    };
   }, []);
+
+  useEffect(() => {
+    navHiddenRef.current = isNavHidden;
+  }, [isNavHidden]);
 
   useEffect(() => {
     if (!modalOpen) {
@@ -292,11 +313,17 @@ function SavoryBitesPage() {
   const showToast = (message) => {
     setToastMessage(message);
     setToastVisible(true);
-    window.clearTimeout(window.__savoryToastTimeout);
-    window.__savoryToastTimeout = window.setTimeout(() => {
+    window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => {
       setToastVisible(false);
     }, 2500);
   };
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(toastTimerRef.current);
+    };
+  }, []);
 
   const addToCart = (id) => {
     setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
