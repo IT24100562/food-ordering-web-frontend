@@ -23,7 +23,7 @@ function HomePage() {
           loop
           playsInline
           preload="metadata"
-          poster="https://lh3.googleusercontent.com/aida-public/AB6AXuDjub_lsxBdwi9NTXAz2xkP23q-96J5Ljjg4-iIO7CIuMVDyX4wurd2DM2k0vTBpKKIsSIR25qUcbgUio2M-FxryRz-T34jDbuJ1bzcvQPagoIBUsPQRzIn3x3eyZmC3aEEj4i12Uw1MrR68mD7ZO7RsMUyCAZRE9BdX_ap7CFf61K4urOUYzuiyzAZd4WUWdf8ch81_V6KdOby4vhdzUXOjX0AQCfHmt3WXauR4IGduENnVTHts-1H8_xh_wTPS05Y_0YXg6ORzbTB"
+          poster="/food-ring-center.jpg"
           aria-label="Hero background video"
         >
           <source src="/home-hero.mp4" type="video/mp4" />

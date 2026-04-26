@@ -369,7 +369,16 @@ function SavoryBitesPage() {
       </header>
 
       <section className="hero">
-        <video className="hero-video" autoPlay muted loop playsInline preload="metadata">
+        <video
+          className="hero-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster="/food-ring-center.jpg"
+          aria-label="Hero background video"
+        >
           <source src="/home-hero.mp4" type="video/mp4" />
         </video>
         <div className="hero-overlay" />
